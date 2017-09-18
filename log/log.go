@@ -4,16 +4,62 @@ import
 (
 	"fmt"
 	"github.com/markoczy/goutil/log/trace"
+	"github.com/markoczy/goutil/log/logconfig"
 )
 
 func Debug(aMessage string) {
-	t, err := trace.TraceDefault()
-	if err != nil {
-		// TODO
-	}
-	fmt.Println(t.Method)
+	logWrite(logconfig.DEBUG, false, aMessage)
 }
 
-func Info() {
+func Info(aMessage string) {
+	logWrite(logconfig.INFO, false, aMessage)
+}
 
+func Warn(aMessage string) {
+	logWrite(logconfig.INFO, false, aMessage)
+}
+
+func Error(aMessage string) {
+	logWrite(logconfig.INFO, false, aMessage)
+}
+
+func Fatal(aMessage string) {
+	logWrite(logconfig.INFO, false, aMessage)
+}
+
+// Format
+
+func Debugf(aMessage string, a ...interface{}) {
+	logWrite(logconfig.DEBUG, false, fmt.Sprintf(aMessage, a...))
+}
+
+func Infof(aMessage string, a ...interface{}) {
+	logWrite(logconfig.INFO, false, fmt.Sprintf(aMessage, a...))
+}
+
+func Warnf(aMessage string, a ...interface{}) {
+	logWrite(logconfig.INFO, false, fmt.Sprintf(aMessage, a...))
+}
+
+func Errorf(aMessage string, a ...interface{}) {
+	logWrite(logconfig.INFO, false, fmt.Sprintf(aMessage, a...))
+}
+
+func Fatalf(aMessage string, a ...interface{}) {
+	logWrite(logconfig.INFO, false, fmt.Sprintf(aMessage, a...))
+}
+
+func logWrite(level int, format bool, aMessage string) {
+
+	if level > logconfig.LogLevel { return }
+	// Get Stack trace
+	t, err := trace.Trace(3)
+	if err != nil {
+		fmt.Println("Logging failed, stack trace not retreived:", err)
+	}
+
+	for _, hndl := range logconfig.LogHandlers {
+		txt := hndl.Format(aMessage, logconfig.STRLEVEL[level],t.File,t.Method,t.Line)
+		hndl.Write(txt)
+	}
 }

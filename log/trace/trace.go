@@ -2,6 +2,7 @@ package trace
 
 import
 (
+	//"fmt"
 	"runtime"
 	"errors"
 	"strings"
@@ -44,7 +45,7 @@ func Trace(aOffset int) (*StackTraceElement, error) {
 	}
 
 	// Preview example:
-	//fmt.Println("DEBUG   "+file+"["+lnFile[1]+"]::"+lines[aOffset*2 + 1]+":")
+	//fmt.Println("DEBUG   "+file+"[",line,"]::"+lines[aOffset*2 + 1]+":")
 	return &StackTraceElement{method, file, line}, nil
 }
 

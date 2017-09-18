@@ -12,7 +12,7 @@ type Command struct {
 	operation Operation
 }
 
-type Operation func([]string) (interface{}, error)
+type Operation func(aArgs []string) (interface{}, error)
 
 func New(aName string, aRegex string, aPriority int, 
 	aOperation Operation) (*Command, error) {
