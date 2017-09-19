@@ -7,44 +7,62 @@ import
 	"github.com/markoczy/goutil/log/handler"
 )
 
-
+// FATAL use log level fatal (0)
 const FATAL = 0
+// ERROR use log level error (1)
 const ERROR = 1
+// WARN use log level warn (2)
 const WARN = 2
+// INFO use log level info (3)
 const INFO = 3
+// DEBUG use log level debug (4)
 const DEBUG = 4
+// DEFAULT use default log level (-100)
+const DEFAULT = -100
 
-var DefaultLogLevel int = DEBUG
+// DefaultLogLevel The default level of logging
+var defaultLogLevel = DEBUG
 
-// TODO how not make this public??
-var LogHandlers []handler.LogHandler = []handler.LogHandler {
-	DEFAULT_LOGHANDLER }
-
-func Register(aHandler *handler.LogHandler) {
-	LogHandlers = append(LogHandlers,*aHandler)
+// SetDefaultLogLevel ...
+func SetDefaultLogLevel(level int) {
+	defaultLogLevel = level
 }
 
-// func UnregisterAll() {
-// 	for _, el range LogHandlers {
-		
-// 	}
-// }
-
-// TODO ptr to defaultLv
-var DEFAULT_LOGHANDLER = handler.LogHandler{Level: DefaultLogLevel, 
-	Format: DEFAULT_LOGFORMAT, Write: DEFAULT_LOGWRITE}
-
-func DEFAULT_LOGWRITE(message string) {
-	fmt.Println(message)
+// DefaultLogLevel ...
+func DefaultLogLevel() int {
+	return defaultLogLevel
 }
 
-func DEFAULT_LOGFORMAT (message string, level string, file string, 
-	method string, line int) string {
+// DefaultLogHandler ...
+var DefaultLogHandler = handler.NewConsoleLogger(DEFAULT, DefaultLogFormat)
+
+// DefaultLogFormat ...
+func DefaultLogFormat (message string, level string, file string, 
+	method string, line int) (string, error) {
 
 	t := time.Now()
 	tStr := t.Format(time.RFC3339)
-	return fmt.Sprintf(log_format, tStr, level, file, method, line, message)
+	return fmt.Sprintf(logFormat, tStr, level, file, method, line,
+		message), nil
 }
 
-const log_format = "[%s] %s %s::%s[%d]: %s"
+var logHandlers = []handler.LogHandler { DefaultLogHandler }
+
+func LogHandlers() []handler.LogHandler {
+	return logHandlers
+}
+
+func Register(aHandler handler.LogHandler) {
+	logHandlers = append(logHandlers,aHandler)
+}
+
+func UnregisterAll() {
+	for _, el := range logHandlers {
+		el.Unlink()
+	}
+	logHandlers = []handler.LogHandler{}
+}
+
+
+const logFormat = "[%s] %s %s::%s[%d]: %s"
 
