@@ -25,7 +25,7 @@ func New(aFilePath string, aBytesPerFile int,
 	return &LogFileWriter{aFilePath,aBytesPerFile,aMaxFiles, nil, nil}, nil
 }
 
-func (w *LogFileWriter)  LogWriter (aMessage string) {
+func (w *LogFileWriter) LogWriter (aMessage string) {
 	w.Write(aMessage)
 }
 
@@ -43,6 +43,10 @@ func (w *LogFileWriter) Write(aMessage string) error {
 	if err != nil { return err }
 	
 	return nil
+}
+
+func (w *LogFileWriter) Unlink() error {
+	return w.closeCurFile()
 }
 
 func initWrite(aWriter *LogFileWriter, aMessage string) (*bufio.Writer,error) {

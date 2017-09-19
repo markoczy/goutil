@@ -2,8 +2,7 @@ package handler
 
 import
 (
-	"fmt"
-	"time"
+	"github.com/markoczy/goutil/log/handler/filewriter"
 )
 
 type LogFormat func(message string, level string, file string, method string, 
@@ -12,27 +11,22 @@ type LogFormat func(message string, level string, file string, method string,
 type LogWrite func(text string)
 
 type LogHandler struct {
+	Level int
 	Format LogFormat
 	Write LogWrite
 }
 
-var DEFAULT_LOGHANDLER = LogHandler{Format: DEFAULT_LOGFORMAT,
-	Write: DEFAULT_LOGWRITE}
+func NewLogHandler(level int, format LogFormat, 
+	write LogWrite) (*LogHandler, error) {
 
-func DEFAULT_LOGWRITE(message string) {
-	fmt.Println(message)
+	return &LogHandler{ level, format, write }, nil
 }
 
-func DEFAULT_LOGFORMAT (message string, level string, file string, 
-	method string, line int) string {
+func NewFileWriter(level int, format LogFormat, fileName string, 
+	bytesMax int, filesMax int) (*LogHandler, error) {
 
-	t := time.Now()
-	tStr := t.Format(time.RFC3339)
-	return fmt.Sprintf(log_format, tStr, level, file, method, line, message)
-}
-
-const log_format = "[%s] %s %s::%s[%d]: %s"
-
-func NewLogHandler(format LogFormat, write LogWrite) (*LogHandler, error) {
-	return &LogHandler{ format, write }, nil
+	// Create and add LogHandler
+	w, err := filewriter.New(fileName, bytesMax, filesMax)
+	if err!= nil { return nil, err }
+	return &LogHandler{ level, format, w.LogWriter }, nil
 }

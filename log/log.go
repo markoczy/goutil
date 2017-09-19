@@ -7,6 +7,8 @@ import
 	"github.com/markoczy/goutil/log/logconfig"
 )
 
+var levels = []string{"FATAL","ERROR","WARN","INFO","DEBUG"}
+
 func Debug(aMessage string) {
 	logWrite(logconfig.DEBUG, false, aMessage)
 }
@@ -51,7 +53,13 @@ func Fatalf(aMessage string, a ...interface{}) {
 
 func logWrite(level int, format bool, aMessage string) {
 
-	if level > logconfig.LogLevel { return }
+	// Check if any has log lv high enough
+	doWrite := false
+	for _, e := range logconfig.LogHandlers {
+		if e.Level >= level { doWrite = true }
+	}
+	if !doWrite { return }
+
 	// Get Stack trace
 	t, err := trace.Trace(3)
 	if err != nil {
@@ -59,7 +67,7 @@ func logWrite(level int, format bool, aMessage string) {
 	}
 
 	for _, hndl := range logconfig.LogHandlers {
-		txt := hndl.Format(aMessage, logconfig.STRLEVEL[level],t.File,t.Method,t.Line)
-		hndl.Write(txt)
+		txt := hndl.Format(aMessage, levels[level],t.File,t.Method,t.Line)
+		if hndl.Level>=level { hndl.Write(txt) }
 	}
 }
