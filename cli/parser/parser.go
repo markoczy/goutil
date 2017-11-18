@@ -6,25 +6,31 @@ import
 	"github.com/markoczy/goutil/cli/command"
 )
 
-type Parser struct {
+type SimpleParser struct {
 	commands []command.Command
 }
 
-func New() *Parser {
-	return &Parser{}
+type Parser interface {
+	AddCommand(aCommand command.Command)
+	Exec(aArgs []string) (interface{}, error)
 }
 
-func AddCommand(aParser *Parser, aCommand command.Command) error {
-	aParser.commands = append(aParser.commands, aCommand)
-	sort.Sort(command.CommandSorter(aParser.commands))
-	return nil
+func New() Parser {
+	return &SimpleParser{}
 }
 
-func Exec(aParser *Parser, aArgs []string) (interface{}, error) {
+func (p *SimpleParser) AddCommand(aCommand command.Command) {
+	p.commands = append(p.commands, aCommand)
+	sort.Sort(command.CommandSorter(p.commands))
+}
+
+func (p *SimpleParser) Exec(aArgs []string) (interface{}, error) {
 	
-	for _, cmd := range aParser.commands {
-		if command.Match(&cmd, aArgs[0]) {
-			return command.Exec(&cmd, aArgs)
+	for _, cmd := range p.commands {
+		match, err := cmd.Match(aArgs[0])
+		if err != nil {return nil, err}
+		if match {
+			return cmd.Exec(aArgs)
 		}
 	}
 

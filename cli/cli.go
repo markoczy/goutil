@@ -6,14 +6,17 @@ import
 	"github.com/markoczy/goutil/cli/command"
 )
 
-func NewParser() *parser.Parser {
+// NewParser ...
+func NewParser() parser.Parser {
 	return parser.New()
 }
 
-func AddCommand(aParser *parser.Parser, aName string, aRegex string, 
-	aPriority int, aOperation command.Operation) error {
+// AddCommand ...
+func AddCommand(aParser parser.Parser, aName string, aPriority int, 
+	aRegex string, aArgCount int, aOperation command.Operation) error {
 
-	cmd, err := command.New(aName, aRegex, aPriority, aOperation)
+	cmd, err := command.New(aName, aPriority, aRegex, aArgCount, aOperation)
 	if err != nil { return err }
-	return parser.AddCommand(aParser, *cmd) 
+	aParser.AddCommand(cmd)
+	return nil
 }
