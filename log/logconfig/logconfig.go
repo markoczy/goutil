@@ -42,7 +42,16 @@ func DefaultLogFormat (message string, level string, file string,
 
 	t := time.Now()
 	tStr := t.Format(time.RFC3339)
-	return fmt.Sprintf(logFormat, tStr, level, file, method, line,
+	return fmt.Sprintf(defaultLogFormat, tStr, level, file, line,
+		message), nil
+}
+
+func ExtendedLogFormat (message string, level string, file string, 
+	method string, line int) (string, error) {
+
+	t := time.Now()
+	tStr := t.Format(time.RFC3339)
+	return fmt.Sprintf(extendedLogFormat, tStr, level, file, method, line,
 		message), nil
 }
 
@@ -64,5 +73,6 @@ func UnregisterAll() {
 }
 
 
-const logFormat = "[%s] %s %s::%s[%d]: %s"
+const defaultLogFormat = "[%s] %s %s(%d): %s"
+const extendedLogFormat = "[%s] %s %s::%s[%d]: %s"
 
