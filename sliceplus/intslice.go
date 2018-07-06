@@ -4,10 +4,10 @@ package sliceplus
 type IntSlice []int
 
 // Filter a Slice
-func (s IntSlice) Filter(filter func(int) bool) IntSlice {
+func (s IntSlice) Filter(filter func(elem int, idx int, slice IntSlice) bool) IntSlice {
 	ret := IntSlice{}
-	for _, e := range s {
-		if filter(e) {
+	for i, e := range s {
+		if filter(e, i, ret) {
 			ret = append(ret, e)
 		}
 	}
