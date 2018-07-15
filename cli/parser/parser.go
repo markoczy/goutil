@@ -1,9 +1,8 @@
 package parser
 
-import 
-(
-	"sort"
+import (
 	"github.com/markoczy/goutil/cli/command"
+	"sort"
 )
 
 type SimpleParser struct {
@@ -25,11 +24,16 @@ func (p *SimpleParser) AddCommand(aCommand command.Command) {
 }
 
 func (p *SimpleParser) Exec(aArgs []string) (interface{}, error) {
-	
 	for _, cmd := range p.commands {
 		match, err := cmd.Match(aArgs[0])
-		if err != nil {return nil, err}
+		if err != nil {
+			return nil, err
+		}
 		if match {
+			err := cmd.Validate(aArgs)
+			if err != nil {
+				return nil, err
+			}
 			return cmd.Exec(aArgs)
 		}
 	}
